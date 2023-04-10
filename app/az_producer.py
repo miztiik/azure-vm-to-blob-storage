@@ -16,11 +16,11 @@ class GlobalArgs:
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
     LOCATION = os.getenv("LOCATION", "westeurope")
     SA_NAME = os.getenv("SA_NAME", "warehousei5chd4011")
-    CONTAINER_NAME = os.getenv("CONTAINER_NAME", "store-events-011")
+    CONTAINER_NAME = os.getenv("CONTAINER_NAME", "store-events-015")
     BLOB_PREFIX = "sales_events"
     EVNT_WEIGHTS = {"success": 80, "fail": 20}
     WAIT_SECS_BETWEEN_MSGS = int(os.getenv("WAIT_SECS_BETWEEN_MSGS", 2))
-    TOT_MSGS_TO_PRODUCE = int(os.getenv("TOT_MSGS_TO_PRODUCE", 2))
+    TOT_MSGS_TO_PRODUCE = int(os.getenv("TOT_MSGS_TO_PRODUCE", 10))
 
 
 

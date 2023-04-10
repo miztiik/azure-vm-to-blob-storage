@@ -111,61 +111,61 @@ To store all the order events, we will create a blob container. To write the eve
         ssh miztiik@publicIPOfSever
         git clone https://github.com/miztiik/azure-vm-to-blob-storage
         cd azure-vm-to-blob-storage
-        cd /var/azure-vm-to-blob-storage/app
+
         # In case the pre-reqs have not been installed, then you will have to run the bootstrap script manually
+        # bash /var/azure-vm-to-blob-storage/modules/vm/bootstrap_scripts/deploy_app.sh
+        export SA_NAME="warehouse4moddm014"
+        export CONTAINER_NAME="store-events-014"
+        python3 /var/azure-vm-to-blob-storage/app/az_producer.py
         ```
 
-   - **Generate Log Data**
+        If everything goes all right, you should see messages like this,
 
-      For some reason the userData, bootstrap script fails, will fix it later. Until then manually copy the `generate_data.sh` from this repo to the server. _You may need elevated privileges to create log file in `/var/log`.
-
-
-      ```bash
-      sudo su
-      cd /var/log/
-      # Copy generate_data.sh to the server
-      sh generate_data.sh &
+        ```bash
+          INFO:azure.core.pipeline.policies.http_logging_policy:Request URL: 'https://warehouse4moddm014.blob.core.windows.net/store-events-014/sales_events/dt%3D2023_04_10/1681153081463131.json'
+          Request method: 'PUT'
+          Request headers:
+              'Content-Length': '386'
+              'x-ms-blob-type': 'REDACTED'
+              'If-None-Match': '*'
+              'x-ms-version': 'REDACTED'
+              'Content-Type': 'application/octet-stream'
+              'Accept': 'application/xml'
+              'Last-Modified': 'Mon, 10 Apr 2023 18:58:01 GMT'
+              'ETag': '"0x8DB39F5820D3CEA"'
+              'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+              'x-ms-request-id': 'ded43899-001e-0019-62de-6bf3bd000000'
+              'x-ms-client-request-id': '9dd7975a-d7d1-11ed-82ed-0bcd26fbfe68'
+              'x-ms-version': 'REDACTED'
+              'x-ms-content-crc64': 'REDACTED'
+              'x-ms-request-server-encrypted': 'REDACTED'
+              'Date': 'Mon, 10 Apr 2023 18:58:00 GMT'
+          INFO:root:Blob sales_events/dt=2023_04_10/1681153081463131.json uploaded successfully
       ```
 
-      The script by default is configured to write one log entry every `5` seconds and generate a total `100000` log lines to`/var/log/miztiik*.json`
+      The script should create store events and write them to Blob container. The path should be something like this `store-events-014/sales_events/dt=2023_04_10/1681153079333515.json`
 
-    
-    - **Query in Azure Log Analytics Workspace**
+      ![Miztiik Automaton: Azure Virtual Machine Access To Blob Storage With User Identity](images/miztiik_automation_azure_alert_on_custom_metrics_architecture_0011.png)
 
-      Login to Azure Log Anaytics portal. You should be able to find it under `/Miztiik_Enterprises_Custom_Logs_To_Monitor_xxx/providers/Microsoft.OperationalInsights/workspaces/lumberyard-payGTier-xxx",`. Navigate to logs, select the custom table(`lumberyardTablexxx_CL`) & `Run`
-
-      ![Miztiik Automaton: Alert on Custom Metrics](images/miztiik_automation_azure_alert_on_custom_metrics_architecture_002.png)
-  
 
   1. **Troubleshooting Azure Monitor Agent**
 
-      - In case if you are facing issues, log into the  VM and check the logs `/var/log/azure/Microsoft.Azure.Monitor.AzureMonitorLinuxAgent/` for potential causes.
-      - Check if your account has Azure Data Lake v2 enabled
-
-        ```sh
-        az resource show \
-          --name  warehousei5chd4011 \
-          --resource-group Miztiik_Enterprises_azure_vm_to_blob_storage_011 \
-          --resource-type "Microsoft.Storage/storageAccounts" \
-          --query properties.isHnsEnabled
-        ```
-      - List Blob Access
+      - Check if the VM can write to blob using cli. List Blobs
 
         ```sh
           RG_NAME="MIZTIIK_ENTERPRISES_AZURE_VM_TO_BLOB_STORAGE_011"
-          SA_ACCOUNT_NAME="warehousei5chd4011"
+          SA_NAME="warehousei5chd4011"
           CONTAINER_NAME="store-events-011"
-          CONTAINER_NAME1="kuy-muy"
 
           az storage blob list \
               --container-name ${CONTAINER_NAME1} \
-              --account-name ${SA_ACCOUNT_NAME} \
+              --account-name ${SA_NAME} \
               --auth-mode login
 
           az storage blob directory list \
               --container-name ${CONTAINER_NAME} \
               -d default \
-              --account-name ${SA_ACCOUNT_NAME} \
+              --account-name ${SA_NAME} \
               --auth-mode login
         ```
 
@@ -174,7 +174,7 @@ To store all the order events, we will create a blob container. To write the eve
         ```sh
         echo "hello world on $(date +'%Y-%m-%d')" > miztiik.log
         az storage blob upload \
-          --account-name ${SA_ACCOUNT_NAME} \
+          --account-name ${SA_NAME} \
           --container-name ${CONTAINER_NAME} \
           --name miztiik.log \
           --file miztiik.log \
@@ -184,9 +184,7 @@ To store all the order events, we will create a blob container. To write the eve
       
 1. ## 📒 Conclusion
 
-    Here we have demonstrated how to configure alerts based on custom logs. You can extend the solution to setup alerts actions groups & receive email notifications. An example of email notification is showin below,
-
-    ![Miztiik Automaton: Alert on Custom Metrics](images/miztiik_automation_azure_alert_on_custom_metrics_architecture_003.png)
+    Here we have demonstrated how to store files or byte stream data to Azure Blob Containers. You can extend the solution to setup trigger in blob conatiners to further process these events.
   
 
 1. ## 🧹 CleanUp
@@ -224,8 +222,6 @@ Thank you for your interest in contributing to our project. Whether it is a bug 
 1. [Azure Docs: Azure RBAC Example Conditions][3]
 1. [Azure Docs: Azure Blob Storage client library for Python][4]
 1. [Azure Docs: Just In Time Access][4]
-
-
 
 
 ### 🏷️ Metadata

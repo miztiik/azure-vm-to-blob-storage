@@ -43,7 +43,7 @@ unassume_role() {
 }
 
 function clone_git_repo(){
-  echo "Cloning Python Libs"
+  echo "Cloning Repo"
     # mkdir -p /var/
     cd /var
     git clone $GIT_REPO_URL
@@ -57,6 +57,7 @@ function add_env_vars(){
 
 function install_libs_on_ubuntu(){
   echo "Installing Azure CLI"
+  echo "Installing Azure CLI" > /var/log/miztiik_cli_install.log
   # https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=apt
   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
@@ -68,7 +69,7 @@ function install_libs_on_ubuntu(){
   echo "Installing Python Libs"
   sudo apt-get -y install jq
   sudo apt-get -y install git
-  sudo apt-get -y install python3-pip --user
+  sudo apt-get -y install python3-pip
   pip install azure-storage-blob azure-identity
 }
 
