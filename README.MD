@@ -31,7 +31,7 @@ Can you show them how the can get started?
 To store all the order events, we will create a blob container. To write the events to the container, lets use a user managed identity with it permission scoped narrowly to a specific blob conainer using Azure RBAC.<sup>[1], [2], [3]</sup>.
 
 
-![Miztiik Automaton: Azure Virtual Machine Access To Blob Storage With User Identity](images/miztiik_automation_azure_alert_on_custom_metrics_architecture_0011.png)
+![Miztiik Automaton: Azure Virtual Machine Access To Blob Storage With User Identity](images/miztiik_automation_azure_vm_to_blob_storage_architecture_001.png)
 
 1. ## 🧰 Prerequisites
 
@@ -106,6 +106,7 @@ To store all the order events, we will create a blob container. To write the eve
 
       - Connect to the using using Just In Time Access<sup>[4]</sup>.
       - Copy the `az_python.py` to the server.
+      - The python script expects the storage account name (`SA_NAME`) and blob container name (`CONTAINER_NAME`) as environment variables. We need to set them before execution.(_Update to your values in the below code_)
 
         ```bash
         ssh miztiik@publicIPOfSever
@@ -141,11 +142,11 @@ To store all the order events, we will create a blob container. To write the eve
               'x-ms-request-server-encrypted': 'REDACTED'
               'Date': 'Mon, 10 Apr 2023 18:58:00 GMT'
           INFO:root:Blob sales_events/dt=2023_04_10/1681153081463131.json uploaded successfully
-      ```
+        ```
 
       The script should create store events and write them to Blob container. The path should be something like this `store-events-014/sales_events/dt=2023_04_10/1681153079333515.json`
 
-      ![Miztiik Automaton: Azure Virtual Machine Access To Blob Storage With User Identity](images/miztiik_automation_azure_alert_on_custom_metrics_architecture_0011.png)
+      ![Miztiik Automaton: Azure Virtual Machine Access To Blob Storage With User Identity](images/miztiik_automation_azure_vm_to_blob_storage_architecture_002.png)
 
 
   1. **Troubleshooting Azure Monitor Agent**
