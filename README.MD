@@ -30,15 +30,6 @@ Can you show them how the can get started?
 
 To store all the order events, we will create a blob container. To write the events to the container, lets use a user managed identity with it permission scoped narrowly to a specific blob conainer using Azure RBAC.<sup>[1], [2], [3]</sup>.
 
-This repository holds the bicep code to deploy the necessary infrastructure for this demo,
-- Virtual Machine(Ubuntu).
-  - (_WIP_)Bootstrapped with custom libs using `userData` script.
-- Storage Account - `warehouseXXXX`
-  - Blob Container - `store-events-xxx`
-- User Managed Identity
-  - Scoped with contributor privileges with conditional access restricting to a container, (_For ex `store-events-xxx`_)
-- Identity attached to the VM
-
 
 ![Miztiik Automaton: Azure Virtual Machine Access To Blob Storage With User Identity](images/miztiik_automation_azure_alert_on_custom_metrics_architecture_0011.png)
 
@@ -55,7 +46,7 @@ This repository holds the bicep code to deploy the necessary infrastructure for 
    - Get the application code
 
      ```bash
-     https://github.com/miztiik/azure-vm-to-blob-storage
+     git clone https://github.com/miztiik/azure-vm-to-blob-storage
      cd azure-vm-to-blob-storage
      ```
 
@@ -92,61 +83,16 @@ This repository holds the bicep code to deploy the necessary infrastructure for 
    Let us walk through each of the stacks,
 
    - **Stack: Main Bicep**
-     The params required for the modules are in `params.json`. Do modify them to suit your need.(_Especially the `adminPassword.secureString` for the VM. You are strongly encouraged to Just-In-Time access or use SSH key instead of password based authentication_). The helper deployment script `deploy.sh` will deploy the `main.bicep` file. This will inturn call the modules for Resource Group(RG), VNet & Virtual Machine, Log analytics workspace, Custom table, Data collection endpoint, Data collection rule(DCR) and finally attach the DCR to the VM.
-
-     **Alert Module**
-      We will create a KQL query to identify order events that match the given criteria - 
-      
-      ```kql
-      lumberyardTable001_CL | where discount > 90 and qty >1 and priority_shipping==true
-      ```
-
-      We can also refine it to aggregate only the events that had been received in the last `5` minutes like this,
-      ```kql
-      lumberyardTable001_CL
-      | where discount > 90 and qty > 1 and priority_shipping == true
-      | where Timestamp > ago(5m)
-      ```
-      But since have the option of choosing an evaluation frequency within the alert configuration, we will us that. Remember `evaluationFrequency` is smaller than the `aggregation` granularity, this will result in sliding window evaluation. The code is configured for `evaluationFrequency` of `1`minute and  aggregation `windowSize` of `5`minutes, resulting in creating a sliding window. This may also mean we can trigger the alarm multiple times for the event. It is a conscious choice, to balance signal-to-noise towards more noise(aka false-positives) when we are trying to catch suspicious activity.
-
-      ```bash
-      sh deploy.sh
-      ```
-
-     This stack will create almost all of the resoureces. The RG is created as a deployment at the subscription level. The other resources are deployments at resource group level. 
-
-    - **Virtual Machine**
-       A Redhat vm is bootstrapped using `customData` to install python3, git. We will use a bash script `generate_data.sh`. It will generate a json conformant log in this location `/var/log/miztiik-yyyy-MM-dd.json` for example _`/var/log/miztiik-2023-04-03.json`_. All new entries are appended to the file with `new-line` being the delimitter as expected by Azure Custom Logs.
-
-        ```json
-        {"request_id": "08b6b258-c6d6-44ff-802e-69d52422095a", "event_type": "inventory_event", "store_id": 45, "cust_id": 4416, "category": "Camera", "sku": 17293, "price": 44.61, "qty": 15
-        , "discount": 73.2, "gift_wrap": 0, "variant": "MystiqueAutomatoon", "priority_shipping": 1, "TimeGenerated": "2023-04-03T10:54:23", "contact_me": "github.com/miztiik" }
-        {"request_id": "60051c39-6817-4f52-bd8f-59cc9a38be0f", "event_type": "inventory_event", "store_id": 64, "cust_id": 4081, "category": "Camera", "sku": 17815, "price": 50.92, "qty": 16
-        , "discount": 29.2, "gift_wrap": 1, "variant": "MystiqueAutomatoon", "priority_shipping": 0, "TimeGenerated": "2023-04-03T10:54:24", "contact_me": "github.com/miztiik" }
-        {"request_id": "f340f343-fc0f-40a1-b9f5-2abdd14b929d", "event_type": "inventory_event", "store_id": 35, "cust_id": 338, "category": "Camera", "sku": 16158, "price": 53.76, "qty": 13,
-        "discount": 34.3, "gift_wrap": 1, "variant": "MystiqueAutomatoon", "priority_shipping": 0, "TimeGenerated": "2023-04-03T10:54:25", "contact_me": "github.com/miztiik" }
-        ```
-        
-        Formatting a single log line entry properly, will look like this,
-
-        ```json
-        {
-          "request_id": "f5570d0f-5389-4bce-98c3-7ed5380eefb2",
-          "event_type": "inventory_event",
-          "store_id": 6,
-          "cust_id": 206,
-          "category": "Camera",
-          "sku": 100657,
-          "price": 2.52,
-          "qty": 18,
-          "discount": 8.2,
-          "gift_wrap": true,
-          "variant": "red",
-          "priority_shipping": true,
-          "TimeGenerated": "2021-04-25T12:52:40.938937",
-          "contact_me": "github.com/miztiik"
-        }
-        ```
+     The params required for the modules are in `params.json`. Do modify them to suit your need.(_Especially the `adminPassword.secureString` for the VM. You are strongly encouraged to Just-In-Time access or use SSH key instead of password based authentication_). The helper deployment script `deploy.sh` will deploy the `main.bicep` file. This will create the following resoureces
+     - Resource Group(RG)
+     - VNet, Subnet & Virtual Machine
+     - Virtual Machine(Ubuntu)
+        - (_WIP_)Bootstrapped with custom libs using `userData` script.
+     - Storage Account - `warehouseXXXX`
+        - Blob Container - `store-events-xxx`
+     - User Managed Identity
+        - Scoped with contributor privileges with conditional access restricting to a container, (_For ex `store-events-xxx`_)
+      - Identity attached to the VM
 
      After successfully deploying the stack, Check the `Resource Groups/Deployments` section for the resources.
 
@@ -155,15 +101,23 @@ This repository holds the bicep code to deploy the necessary infrastructure for 
 
    - **Connect to the VM**
 
-      Connect to the VM using Just-In-Time access. This should allow your IP/IP list to securelly connect to your VM using private IP address. Use the password you updated in the `params.json`
+      The Ubuntu vm _should_ be bootstrapped using `userData` to install python3, git and also Azure Blob Storage Client Library<sup>[4]</sup>. (_For some reason the userData, bootstrap script fails, [Let me know if know how to fix it](/issues))
+      We will use a python script `az_python.py` to generate the store events data.
+
+      - Connect to the using using Just In Time Access<sup>[4]</sup>.
+      - Copy the `az_python.py` to the server.
 
         ```bash
-        ssh miztiik@publicIP
+        ssh miztiik@publicIPOfSever
+        git clone https://github.com/miztiik/azure-vm-to-blob-storage
+        cd azure-vm-to-blob-storage
+        cd /var/azure-vm-to-blob-storage/app
+        # In case the pre-reqs have not been installed, then you will have to run the bootstrap script manually
         ```
 
    - **Generate Log Data**
 
-      For some reason the customData, bootstrap script fails, will fix it later. Until then manually copy the `generate_data.sh` from this repo to the server. _You may need elevated privileges to create log file in `/var/log`.
+      For some reason the userData, bootstrap script fails, will fix it later. Until then manually copy the `generate_data.sh` from this repo to the server. _You may need elevated privileges to create log file in `/var/log`.
 
 
       ```bash
@@ -268,16 +222,9 @@ Thank you for your interest in contributing to our project. Whether it is a bug 
 1. [Azure Docs: Azure RBAC][1]
 1. [Azure Docs: Azure ABAC][2]
 1. [Azure Docs: Azure RBAC Example Conditions][3]
-1. [Azure Docs: Azure Monitor Agents -vs- Other Agatnes Overview][2]
-1. [Azure Docs: Collect text logs with Azure Monitor Agent][3]
-1. [Azure Docs: Collect text logs with Log Analytics Agent][4]
-1. [Azure Docs: Custom Table][5]
-1. [Azure Docs: Workspace Table Creation][6]
-1. [Azure Docs: Log Data Plan Basic-vs-Analytics Comparison][7]
-1. [Azure Docs: Custom Log Ingestion using python SDK][8]
-1. [Azure Docs: Custom Metrics to Azure Monitor][9]
-1. [Azure Docs: Check Logs in Azure Logs][10]
-1. [Azure Docs: Troubleshoot Azure Monitor Agent][11]
+1. [Azure Docs: Azure Blob Storage client library for Python][4]
+1. [Azure Docs: Just In Time Access][4]
+
 
 
 
@@ -290,6 +237,10 @@ Thank you for your interest in contributing to our project. Whether it is a bug 
 [1]: https://learn.microsoft.com/en-us/azure/role-based-access-control/conditions-role-assignments-portal
 [2]: https://learn.microsoft.com/en-us/azure/role-based-access-control/conditions-overview
 [3]: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-auth-abac-examples?toc=%2Fazure%2Frole-based-access-control%2Ftoc.json
+[4]: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-python
+
+
+[5]: https://learn.microsoft.com/en-us/azure/defender-for-cloud/just-in-time-access-usage
 
 [100]: https://www.udemy.com/course/aws-cloud-security/?referralCode=B7F1B6C78B45ADAF77A9
 [101]: https://www.udemy.com/course/aws-cloud-security-proactive-way/?referralCode=71DC542AD4481309A441
