@@ -49,9 +49,9 @@ def _rand_coin_flip():
 def _gen_uuid():
     return str(uuid.uuid4())
 
-def write_to_blob(data, blob_svc_client):
+def write_to_blob(container_prefix ,data, blob_svc_client):
     try:
-        blob_name = f"{GlobalArgs.BLOB_PREFIX}/dt={datetime.datetime.now().strftime('%Y_%m_%d')}/{datetime.datetime.now().strftime('%s%f')}.json"
+        blob_name = f"{GlobalArgs.BLOB_PREFIX}/event_type={container_prefix}/dt={datetime.datetime.now().strftime('%Y_%m_%d')}/{datetime.datetime.now().strftime('%s%f')}.json"
         resp = blob_svc_client.get_blob_client(container=f"{GlobalArgs.CONTAINER_NAME}", blob=blob_name).upload_blob(json.dumps(data).encode("UTF-8"))
         logger.info(f"Blob {blob_name} uploaded successfully")
     except Exception as e:
@@ -122,7 +122,7 @@ def lambda_handler(event, context):
 
             # write to blob
             print (json.dumps(evnt_body, indent=4))
-            write_to_blob(evnt_body, blob_svc_client)
+            write_to_blob(_evnt_type, evnt_body, blob_svc_client)
 
             t_msgs += 1
             t_sales += _s
