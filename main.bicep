@@ -62,11 +62,14 @@ module r_vm 'modules/vm/create_vm.bicep' = {
     vmParams: vmParams
     vnetName: r_vnet.outputs.vnetName
     saName: r_sa.outputs.saName
+
     blobContainerName: r_sa.outputs.blobContainerName
     saPrimaryEndpointsBlob: r_sa.outputs.saPrimaryEndpointsBlob
-    dataCollectionEndpointId: r_dataCollectionEndpoint.outputs.DataCollectionEndpointId
-    dataCollectionRuleId: r_dataCollectionRule.outputs.dataCollectionRuleId
 
+    linDataCollectionEndpointId: r_dataCollectionEndpoint.outputs.linDataCollectionEndpointId
+
+    storeEventsDcrId: r_dataCollectionRule.outputs.storeEventsDcrId
+    automationEventsDcrId: r_dataCollectionRule.outputs.automationEventsDcrId
     tags: tags
   }
   dependsOn: [
@@ -89,7 +92,7 @@ module r_logAnalyticsWorkspace 'modules/monitor/log_analytics_workspace.bicep' =
 
 module r_dataCollectionEndpoint 'modules/monitor/data_collection_endpoint.bicep' = {
   scope: resourceGroup(r_rg.name)
-  name: '${dceParams.endpointName}_${deploymentParams.global_uniqueness}_dce'
+  name: '${dceParams.endpointNamePrefix}_${deploymentParams.global_uniqueness}_Dce'
   params: {
     deploymentParams:deploymentParams
     dceParams: dceParams
@@ -106,10 +109,15 @@ module r_dataCollectionRule 'modules/monitor/data_collection_rule.bicep' = {
   params: {
     deploymentParams:deploymentParams
     osKind: 'Linux'
-    ruleName: 'webStoreDataCollectorRule'
-    logFilePattern: '/var/log/miztiik*.json'
-    dataCollectionEndpointId: r_dataCollectionEndpoint.outputs.DataCollectionEndpointId
-    customTableNamePrefix: r_logAnalyticsWorkspace.outputs.customTableNamePrefix
+    storeEventsRuleName: 'webStoreDcr'
+    storeEventsLogFilePattern: '/var/log/miztiik*.json'
+    storeEventscustomTableNamePrefix: r_logAnalyticsWorkspace.outputs.storeEventsCustomTableNamePrefix
+
+    automationEventsRuleName: 'miztiikAutomationDcr'
+    automationEventsLogFilePattern: '/var/log/miztiik-automation-*.log'
+    automationEventsCustomTableNamePrefix: r_logAnalyticsWorkspace.outputs.automationEventsCustomTableNamePrefix
+
+    linDataCollectionEndpointId: r_dataCollectionEndpoint.outputs.linDataCollectionEndpointId
     logAnalyticsPayGWorkspaceName:r_logAnalyticsWorkspace.outputs.logAnalyticsPayGWorkspaceName
     logAnalyticsPayGWorkspaceId:r_logAnalyticsWorkspace.outputs.logAnalyticsPayGWorkspaceId
     tags: tags

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "3408221461391049040"
+      "templateHash": "18278146795939934552"
     }
   },
   "parameters": {
@@ -426,11 +426,14 @@
           "saPrimaryEndpointsBlob": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Sa', parameters('storageAccountParams').storageAccountNamePrefix, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.saPrimaryEndpointsBlob.value]"
           },
-          "dataCollectionEndpointId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_dce', parameters('dceParams').endpointName, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.DataCollectionEndpointId.value]"
+          "linDataCollectionEndpointId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dce', parameters('dceParams').endpointNamePrefix, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.linDataCollectionEndpointId.value]"
           },
-          "dataCollectionRuleId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dcr', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.dataCollectionRuleId.value]"
+          "storeEventsDcrId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dcr', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.storeEventsDcrId.value]"
+          },
+          "automationEventsDcrId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dcr', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.automationEventsDcrId.value]"
           },
           "tags": {
             "value": "[parameters('tags')]"
@@ -443,7 +446,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "3496274227831132411"
+              "templateHash": "1534206703587613359"
             }
           },
           "parameters": {
@@ -469,10 +472,13 @@
             "vnetName": {
               "type": "string"
             },
-            "dataCollectionEndpointId": {
+            "linDataCollectionEndpointId": {
               "type": "string"
             },
-            "dataCollectionRuleId": {
+            "storeEventsDcrId": {
+              "type": "string"
+            },
+            "automationEventsDcrId": {
               "type": "string"
             },
             "vmName": {
@@ -497,7 +503,7 @@
             }
           },
           "variables": {
-            "userDataScript": "IyEvYmluL2Jhc2gKIyBzZXQgLWV4CnNldCAteApzZXQgLW8gcGlwZWZhaWwKCiMgdmVyc2lvbjogMTBBcHIyMDIzCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjICAgICBTRVQgR0xPQkFMUyAgICAgIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwoKUkVQT19OQU1FPSJhenVyZS12bS10by1ibG9iLXN0b3JhZ2UiCgpHSVRfUkVQT19VUkw9Imh0dHBzOi8vZ2l0aHViLmNvbS9taXp0aWlrLyRSRVBPX05BTUUuZ2l0IgoKQVBQX0RJUj0iL3Zhci8kUkVQT19OQU1FIgoKTE9HX0ZJTEU9Ii92YXIvbG9nL21penRpaWstYXV0b21hdGlvbi1ib290c3RyYXAubG9nIgoKIyBodHRwczovL2xlYXJuLm1pY3Jvc29mdC5jb20vZW4tdXMvYXp1cmUvdmlydHVhbC1tYWNoaW5lcy9saW51eC90dXRvcmlhbC1hdXRvbWF0ZS12bS1kZXBsb3ltZW50CgppbnN0cnVjdGlvbigpCnsKICBlY2hvICJ1c2FnZTogLi9idWlsZC5zaCBwYWNrYWdlIDxzdGFnZT4gPHJlZ2lvbj4iCiAgZWNobyAiIgogIGVjaG8gIi9idWlsZC5zaCBkZXBsb3kgPHN0YWdlPiA8cmVnaW9uPiA8cGtnX2Rpcj4iCiAgZWNobyAiIgogIGVjaG8gIi9idWlsZC5zaCB0ZXN0LTx0ZXN0X3R5cGU+IDxzdGFnZT4iCn0KCmVjaG9lcnJvcigpIHsKICAgIHByaW50ZiAiJHtSQ30gKiBFUlJPUiR7RUN9OiAkQFxuIiAxPiYyOwp9Cgphc3N1bWVfcm9sZSgpIHsKICBpZiBbIC1uICIkREVQTE9ZRVJfUk9MRV9BUk4iIF07IHRoZW4KICAgIGVjaG8gIkFzc3VtaW5nIHJvbGUgJERFUExPWUVSX1JPTEVfQVJOIC4uLiIKICBmaQp9Cgp1bmFzc3VtZV9yb2xlKCkgewogIHVuc2V0IFRPS0VOCn0KCmZ1bmN0aW9uIGNsb25lX2dpdF9yZXBvKCl7CiAgZWNobyAiQ2xvbmluZyBSZXBvIgogICAgIyBta2RpciAtcCAvdmFyLwogICAgY2QgL3ZhcgogICAgZ2l0IGNsb25lICRHSVRfUkVQT19VUkwKICAgIGNkIC92YXIvJFJFUE9fTkFNRQp9CgpmdW5jdGlvbiBhZGRfZW52X3ZhcnMoKXsKICAgIElNRFM9YGN1cmwgLXMgLUggTWV0YWRhdGE6dHJ1ZSAtLW5vcHJveHkgIioiICJodHRwOi8vMTY5LjI1NC4xNjkuMjU0L21ldGFkYXRhL2luc3RhbmNlP2FwaS12ZXJzaW9uPTIwMjEtMDItMDEiYAogICAgZGVjbGFyZSAtZyBVU0VSX0RBVEFfU0NSSVBUPWBjdXJsIC1IIE1ldGFkYXRhOnRydWUgLS1ub3Byb3h5ICIqIiAiaHR0cDovLzE2OS4yNTQuMTY5LjI1NC9tZXRhZGF0YS9pbnN0YW5jZS9jb21wdXRlL3VzZXJEYXRhP2FwaS12ZXJzaW9uPTIwMjEtMDEtMDEmZm9ybWF0PXRleHQiIHwgYmFzZTY0IC0tZGVjb2RlYAp9CgpmdW5jdGlvbiBpbnN0YWxsX2xpYnNfb25fdWJ1bnR1KCl7CiAgZWNobyAiSW5zdGFsbGluZyBBenVyZSBDTEkiCiAgZWNobyAiSW5zdGFsbGluZyBBenVyZSBDTEkiID4gL3Zhci9sb2cvbWl6dGlpa19jbGlfaW5zdGFsbC5sb2cKICAjIGh0dHBzOi8vbGVhcm4ubWljcm9zb2Z0LmNvbS9lbi11cy9jbGkvYXp1cmUvaW5zdGFsbC1henVyZS1jbGktbGludXg/cGl2b3RzPWFwdAogIGN1cmwgLXNMIGh0dHBzOi8vYWthLm1zL0luc3RhbGxBenVyZUNMSURlYiB8IHN1ZG8gYmFzaAoKICAjIEluaXRpYXRlIGF6IGxvZ2luCiAKICBheiBjb25maWcgc2V0IGV4dGVuc2lvbi51c2VfZHluYW1pY19pbnN0YWxsPXllc193aXRob3V0X3Byb21wdAogIGF6IGxvZ2luIC0taWRlbnRpdHkKCiAgZWNobyAiSW5zdGFsbGluZyBQeXRob24gTGlicyIKICBzdWRvIGFwdC1nZXQgLXkgaW5zdGFsbCBqcQogIHN1ZG8gYXB0LWdldCAteSBpbnN0YWxsIGdpdAogIHN1ZG8gYXB0LWdldCAteSBpbnN0YWxsIHB5dGhvbjMtcGlwCiAgcGlwIGluc3RhbGwgYXp1cmUtc3RvcmFnZS1ibG9iIGF6dXJlLWlkZW50aXR5Cn0KCmZ1bmN0aW9uIGluc3RhbGxfbGlicygpewogICAgIyBQcmVwYXJlIHRoZSBzZXJ2ZXIgZm9yIHB5dGhvbjMKICAgIHN1ZG8geXVtIC15IGluc3RhbGwgZ2l0IGpxCiAgICBzdWRvIHl1bSAteSBpbnN0YWxsIHB5dGhvbjMtcGlwCiAgICBzdWRvIHl1bSAteSBpbnN0YWxsIHB5dGhvbjMgCn0KCmZ1bmN0aW9uIGluc3RhbGxfbm9kZWpzKCl7CiAgICBjdXJsIC1vLSBodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vbnZtLXNoL252bS92MC4zNC4wL2luc3RhbGwuc2ggfCBiYXNoCiAgICAuIH4vLm52bS9udm0uc2gKICAgIG52bSBpbnN0YWxsIG5vZGUKICAgIG5vZGUgLWUgImNvbnNvbGUubG9nKCdSdW5uaW5nIE5vZGUuanMgJyArIHByb2Nlc3MudmVyc2lvbikiCn0KCmZ1bmN0aW9uIGNoZWNrX2V4ZWN1dGlvbigpewogICAgZWNobyAiaGVsbG8iID4vdmFyL2xvZy9taXp0aWlrLmxvZwp9CgpjaGVja19leGVjdXRpb24gICAgICAgICAgICAgICAgIHwgdGVlICIke0xPR19GSUxFfSIKaW5zdGFsbF9saWJzX29uX3VidW50dSAgICAgICAgICB8IHRlZSAiJHtMT0dfRklMRX0iCmNsb25lX2dpdF9yZXBvICAgICAgICAgICAgICAgICAgfCB0ZWUgIiR7TE9HX0ZJTEV9IgoKCgo=",
+            "userDataScript": "IyEvYmluL2Jhc2gKIyBzZXQgLWV4CnNldCAteApzZXQgLW8gcGlwZWZhaWwKCiMgdmVyc2lvbjogMTBBcHIyMDIzCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjICAgICBTRVQgR0xPQkFMUyAgICAgIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwoKUkVQT19OQU1FPSJhenVyZS12bS10by1ibG9iLXN0b3JhZ2UiCgpHSVRfUkVQT19VUkw9Imh0dHBzOi8vZ2l0aHViLmNvbS9taXp0aWlrLyRSRVBPX05BTUUuZ2l0IgoKQVBQX0RJUj0iL3Zhci8kUkVQT19OQU1FIgoKTE9HX0ZJTEU9Ii92YXIvbG9nL21penRpaWstYXV0b21hdGlvbi1ib290c3RyYXAtJChkYXRlICsnJVktJW0tJWQnKS5sb2ciCgojIGh0dHBzOi8vbGVhcm4ubWljcm9zb2Z0LmNvbS9lbi11cy9henVyZS92aXJ0dWFsLW1hY2hpbmVzL2xpbnV4L3R1dG9yaWFsLWF1dG9tYXRlLXZtLWRlcGxveW1lbnQKCmluc3RydWN0aW9uKCkKewogIGVjaG8gInVzYWdlOiAuL2J1aWxkLnNoIHBhY2thZ2UgPHN0YWdlPiA8cmVnaW9uPiIKICBlY2hvICIiCiAgZWNobyAiL2J1aWxkLnNoIGRlcGxveSA8c3RhZ2U+IDxyZWdpb24+IDxwa2dfZGlyPiIKICBlY2hvICIiCiAgZWNobyAiL2J1aWxkLnNoIHRlc3QtPHRlc3RfdHlwZT4gPHN0YWdlPiIKfQoKZWNob2Vycm9yKCkgewogICAgcHJpbnRmICIke1JDfSAqIEVSUk9SJHtFQ306ICRAXG4iIDE+JjI7Cn0KCmFzc3VtZV9yb2xlKCkgewogIGlmIFsgLW4gIiRERVBMT1lFUl9ST0xFX0FSTiIgXTsgdGhlbgogICAgZWNobyAiQXNzdW1pbmcgcm9sZSAkREVQTE9ZRVJfUk9MRV9BUk4gLi4uIgogIGZpCn0KCnVuYXNzdW1lX3JvbGUoKSB7CiAgdW5zZXQgVE9LRU4KfQoKZnVuY3Rpb24gY2xvbmVfZ2l0X3JlcG8oKXsKICBlY2hvICJDbG9uaW5nIFJlcG8iCiAgICAjIG1rZGlyIC1wIC92YXIvCiAgICBjZCAvdmFyCiAgICBnaXQgY2xvbmUgJEdJVF9SRVBPX1VSTAogICAgY2QgL3Zhci8kUkVQT19OQU1FCn0KCmZ1bmN0aW9uIGFkZF9lbnZfdmFycygpewogICAgSU1EUz1gY3VybCAtcyAtSCBNZXRhZGF0YTp0cnVlIC0tbm9wcm94eSAiKiIgImh0dHA6Ly8xNjkuMjU0LjE2OS4yNTQvbWV0YWRhdGEvaW5zdGFuY2U/YXBpLXZlcnNpb249MjAyMS0wMi0wMSJgCiAgICBkZWNsYXJlIC1nIFVTRVJfREFUQV9TQ1JJUFQ9YGN1cmwgLUggTWV0YWRhdGE6dHJ1ZSAtLW5vcHJveHkgIioiICJodHRwOi8vMTY5LjI1NC4xNjkuMjU0L21ldGFkYXRhL2luc3RhbmNlL2NvbXB1dGUvdXNlckRhdGE/YXBpLXZlcnNpb249MjAyMS0wMS0wMSZmb3JtYXQ9dGV4dCIgfCBiYXNlNjQgLS1kZWNvZGVgCn0KCmZ1bmN0aW9uIGluc3RhbGxfbGlic19vbl91YnVudHUoKXsKICBlY2hvICJJbnN0YWxsaW5nIEF6dXJlIENMSSIKICBlY2hvICJJbnN0YWxsaW5nIEF6dXJlIENMSSIgPiAvdmFyL2xvZy9taXp0aWlrX2NsaV9pbnN0YWxsLmxvZwogICMgaHR0cHM6Ly9sZWFybi5taWNyb3NvZnQuY29tL2VuLXVzL2NsaS9henVyZS9pbnN0YWxsLWF6dXJlLWNsaS1saW51eD9waXZvdHM9YXB0CiAgY3VybCAtc0wgaHR0cHM6Ly9ha2EubXMvSW5zdGFsbEF6dXJlQ0xJRGViIHwgc3VkbyBiYXNoCgogICMgSW5pdGlhdGUgYXogbG9naW4KIAogIGF6IGNvbmZpZyBzZXQgZXh0ZW5zaW9uLnVzZV9keW5hbWljX2luc3RhbGw9eWVzX3dpdGhvdXRfcHJvbXB0CiAgYXogbG9naW4gLS1pZGVudGl0eQoKICBlY2hvICJJbnN0YWxsaW5nIFB5dGhvbiBMaWJzIgogIHN1ZG8gYXB0LWdldCAteSBpbnN0YWxsIGpxCiAgc3VkbyBhcHQtZ2V0IC15IGluc3RhbGwgZ2l0CiAgc3VkbyBhcHQtZ2V0IC15IGluc3RhbGwgcHl0aG9uMy1waXAKICBwaXAgaW5zdGFsbCBhenVyZS1zdG9yYWdlLWJsb2IgYXp1cmUtaWRlbnRpdHkKfQoKZnVuY3Rpb24gaW5zdGFsbF9saWJzKCl7CiAgICAjIFByZXBhcmUgdGhlIHNlcnZlciBmb3IgcHl0aG9uMwogICAgc3VkbyB5dW0gLXkgaW5zdGFsbCBnaXQganEKICAgIHN1ZG8geXVtIC15IGluc3RhbGwgcHl0aG9uMy1waXAKICAgIHN1ZG8geXVtIC15IGluc3RhbGwgcHl0aG9uMyAKfQoKZnVuY3Rpb24gaW5zdGFsbF9ub2RlanMoKXsKICAgIGN1cmwgLW8tIGh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9udm0tc2gvbnZtL3YwLjM0LjAvaW5zdGFsbC5zaCB8IGJhc2gKICAgIC4gfi8ubnZtL252bS5zaAogICAgbnZtIGluc3RhbGwgbm9kZQogICAgbm9kZSAtZSAiY29uc29sZS5sb2coJ1J1bm5pbmcgTm9kZS5qcyAnICsgcHJvY2Vzcy52ZXJzaW9uKSIKfQoKZnVuY3Rpb24gY2hlY2tfZXhlY3V0aW9uKCl7CiAgICBlY2hvICJoZWxsbyIgPi92YXIvbG9nL21penRpaWsubG9nCn0KCmNoZWNrX2V4ZWN1dGlvbiAgICAgICAgICAgICAgICAgfCB0ZWUgLWEgIiR7TE9HX0ZJTEV9IgppbnN0YWxsX2xpYnNfb25fdWJ1bnR1ICAgICAgICAgIHwgdGVlIC1hICIke0xPR19GSUxFfSIKY2xvbmVfZ2l0X3JlcG8gICAgICAgICAgICAgICAgICB8IHRlZSAtYSAiJHtMT0dfRklMRX0iCgoKCg==",
             "LinuxConfiguration": {
               "disablePasswordAuthentication": true,
               "ssh": {
@@ -792,7 +798,7 @@
               "scope": "[format('Microsoft.Compute/virtualMachines/{0}', parameters('vmName'))]",
               "name": "configurationAccessEndpoint",
               "properties": {
-                "dataCollectionEndpointId": "[parameters('dataCollectionEndpointId')]",
+                "dataCollectionEndpointId": "[parameters('linDataCollectionEndpointId')]",
                 "description": "Send Custom logs to DCR"
               },
               "dependsOn": [
@@ -803,10 +809,23 @@
               "type": "Microsoft.Insights/dataCollectionRuleAssociations",
               "apiVersion": "2021-09-01-preview",
               "scope": "[format('Microsoft.Compute/virtualMachines/{0}', parameters('vmName'))]",
-              "name": "[format('{0}_{1}', parameters('vmName'), parameters('deploymentParams').global_uniqueness)]",
+              "name": "[format('{0}_storeEventsDcr_{1}', parameters('vmName'), parameters('deploymentParams').global_uniqueness)]",
               "properties": {
-                "dataCollectionRuleId": "[parameters('dataCollectionRuleId')]",
-                "description": "Send Custom logs to DCR"
+                "dataCollectionRuleId": "[parameters('storeEventsDcrId')]",
+                "description": "Send Application Logs to DCR"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Insights/dataCollectionRuleAssociations",
+              "apiVersion": "2021-09-01-preview",
+              "scope": "[format('Microsoft.Compute/virtualMachines/{0}', parameters('vmName'))]",
+              "name": "[format('{0}_automationEvents_{1}', parameters('vmName'), parameters('deploymentParams').global_uniqueness)]",
+              "properties": {
+                "dataCollectionRuleId": "[parameters('automationEventsDcrId')]",
+                "description": "Send Automation Logs to DCR"
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
@@ -854,16 +873,12 @@
             "vmIdentityId": {
               "type": "string",
               "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}_{1}_Identity', parameters('vmName'), parameters('deploymentParams').global_uniqueness))]"
-            },
-            "a4": {
-              "type": "string",
-              "value": "[format('((!(ActionMatches{{''Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read''}})) OR (@Resource[Microsoft.Storage/storageAccounts/blobServices/containers:name] StringEquals ''{0}''))', parameters('blobContainerName'))]"
             }
           }
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_dce', parameters('dceParams').endpointName, parameters('deploymentParams').global_uniqueness))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dce', parameters('dceParams').endpointNamePrefix, parameters('deploymentParams').global_uniqueness))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dcr', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness))]",
         "[subscriptionResourceId('Microsoft.Resources/deployments', variables('rgName'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Sa', parameters('storageAccountParams').storageAccountNamePrefix, parameters('deploymentParams').global_uniqueness))]",
@@ -898,7 +913,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "7790792085380360246"
+              "templateHash": "6532514839441292738"
             }
           },
           "parameters": {
@@ -950,11 +965,14 @@
             {
               "type": "Microsoft.OperationalInsights/workspaces/tables",
               "apiVersion": "2022-10-01",
-              "name": "[format('{0}/{1}', format('{0}-payGTier-{1}', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness), format('{0}{1}_CL', parameters('logAnalyticsWorkspaceParams').customTableName, parameters('deploymentParams').global_uniqueness))]",
+              "name": "[format('{0}/{1}', format('{0}-payGTier-{1}', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness), format('{0}{1}_CL', parameters('logAnalyticsWorkspaceParams').storeEventsCustomTableName, parameters('deploymentParams').global_uniqueness))]",
               "properties": {
+                "plan": "Analytics",
                 "retentionInDays": -1,
                 "schema": {
-                  "name": "[format('{0}{1}_CL', parameters('logAnalyticsWorkspaceParams').customTableName, parameters('deploymentParams').global_uniqueness)]",
+                  "description": "Store order events custom table",
+                  "displayName": "DOESNT-SEEM-TO-WORK-STORE-EVENTS",
+                  "name": "[format('{0}{1}_CL', parameters('logAnalyticsWorkspaceParams').storeEventsCustomTableName, parameters('deploymentParams').global_uniqueness)]",
                   "columns": [
                     {
                       "name": "TimeGenerated",
@@ -1022,9 +1040,38 @@
                       "displayName": "contact_me",
                       "type": "string"
                     }
-                  ],
-                  "description": "Store order schema table",
-                  "displayName": "NO-IDEA-WHAT-DISPLAY-NAME-IS"
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-payGTier-{1}', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness))]"
+              ]
+            },
+            {
+              "type": "Microsoft.OperationalInsights/workspaces/tables",
+              "apiVersion": "2022-10-01",
+              "name": "[format('{0}/{1}', format('{0}-payGTier-{1}', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness), format('{0}{1}_CL', parameters('logAnalyticsWorkspaceParams').automationEventsCustomTableName, parameters('deploymentParams').global_uniqueness))]",
+              "properties": {
+                "plan": "Analytics",
+                "retentionInDays": -1,
+                "schema": {
+                  "description": "Miztiik Automation Events",
+                  "displayName": "DOESNT-SEEM-TO-WORK-AUTOMATION-EVENTS",
+                  "name": "[format('{0}{1}_CL', parameters('logAnalyticsWorkspaceParams').automationEventsCustomTableName, parameters('deploymentParams').global_uniqueness)]",
+                  "columns": [
+                    {
+                      "name": "TimeGenerated",
+                      "type": "datetime"
+                    },
+                    {
+                      "name": "RawData",
+                      "type": "string"
+                    },
+                    {
+                      "name": "request_id",
+                      "type": "string"
+                    }
+                  ]
                 }
               },
               "dependsOn": [
@@ -1045,13 +1092,21 @@
               "type": "string",
               "value": "[resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-commitTier-{1}', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness))]"
             },
-            "customTableNamePrefix": {
+            "storeEventsCustomTableNamePrefix": {
               "type": "string",
-              "value": "[format('{0}{1}', parameters('logAnalyticsWorkspaceParams').customTableName, parameters('deploymentParams').global_uniqueness)]"
+              "value": "[format('{0}{1}', parameters('logAnalyticsWorkspaceParams').storeEventsCustomTableName, parameters('deploymentParams').global_uniqueness)]"
             },
-            "customTableName": {
+            "storeEventsCustomTableName": {
               "type": "string",
-              "value": "[format('{0}{1}_CL', parameters('logAnalyticsWorkspaceParams').customTableName, parameters('deploymentParams').global_uniqueness)]"
+              "value": "[format('{0}{1}_CL', parameters('logAnalyticsWorkspaceParams').storeEventsCustomTableName, parameters('deploymentParams').global_uniqueness)]"
+            },
+            "automationEventsCustomTableNamePrefix": {
+              "type": "string",
+              "value": "[format('{0}{1}', parameters('logAnalyticsWorkspaceParams').automationEventsCustomTableName, parameters('deploymentParams').global_uniqueness)]"
+            },
+            "automationEventsCustomTableName": {
+              "type": "string",
+              "value": "[format('{0}{1}_CL', parameters('logAnalyticsWorkspaceParams').automationEventsCustomTableName, parameters('deploymentParams').global_uniqueness)]"
             }
           }
         }
@@ -1063,7 +1118,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[format('{0}_{1}_dce', parameters('dceParams').endpointName, parameters('deploymentParams').global_uniqueness)]",
+      "name": "[format('{0}_{1}_Dce', parameters('dceParams').endpointNamePrefix, parameters('deploymentParams').global_uniqueness)]",
       "resourceGroup": "[variables('rgName')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -1091,7 +1146,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "5228169112392376754"
+              "templateHash": "13523076799702723316"
             }
           },
           "parameters": {
@@ -1113,7 +1168,7 @@
             {
               "type": "Microsoft.Insights/dataCollectionEndpoints",
               "apiVersion": "2021-04-01",
-              "name": "[format('{0}-{1}', parameters('dceParams').endpointName, parameters('deploymentParams').global_uniqueness)]",
+              "name": "[format('{0}-Dce-{1}', parameters('dceParams').endpointNamePrefix, parameters('deploymentParams').global_uniqueness)]",
               "location": "[parameters('deploymentParams').location]",
               "tags": "[parameters('tags')]",
               "kind": "[parameters('osKind')]",
@@ -1125,13 +1180,13 @@
             }
           ],
           "outputs": {
-            "DataCollectionEndpointId": {
+            "linDataCollectionEndpointId": {
               "type": "string",
-              "value": "[resourceId('Microsoft.Insights/dataCollectionEndpoints', format('{0}-{1}', parameters('dceParams').endpointName, parameters('deploymentParams').global_uniqueness))]"
+              "value": "[resourceId('Microsoft.Insights/dataCollectionEndpoints', format('{0}-Dce-{1}', parameters('dceParams').endpointNamePrefix, parameters('deploymentParams').global_uniqueness))]"
             },
-            "DataCollectionEndpointName": {
+            "linDataCollectionEndpointName": {
               "type": "string",
-              "value": "[format('{0}-{1}', parameters('dceParams').endpointName, parameters('deploymentParams').global_uniqueness)]"
+              "value": "[format('{0}-Dce-{1}', parameters('dceParams').endpointNamePrefix, parameters('deploymentParams').global_uniqueness)]"
             }
           }
         }
@@ -1157,17 +1212,26 @@
           "osKind": {
             "value": "Linux"
           },
-          "ruleName": {
-            "value": "webStoreDataCollectorRule"
+          "storeEventsRuleName": {
+            "value": "webStoreDcr"
           },
-          "logFilePattern": {
+          "storeEventsLogFilePattern": {
             "value": "/var/log/miztiik*.json"
           },
-          "dataCollectionEndpointId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_dce', parameters('dceParams').endpointName, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.DataCollectionEndpointId.value]"
+          "storeEventscustomTableNamePrefix": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_La', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.storeEventsCustomTableNamePrefix.value]"
           },
-          "customTableNamePrefix": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_La', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.customTableNamePrefix.value]"
+          "automationEventsRuleName": {
+            "value": "miztiikAutomationDcr"
+          },
+          "automationEventsLogFilePattern": {
+            "value": "/var/log/miztiik-automation-*.log"
+          },
+          "automationEventsCustomTableNamePrefix": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_La', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.automationEventsCustomTableNamePrefix.value]"
+          },
+          "linDataCollectionEndpointId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dce', parameters('dceParams').endpointNamePrefix, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.linDataCollectionEndpointId.value]"
           },
           "logAnalyticsPayGWorkspaceName": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_La', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.logAnalyticsPayGWorkspaceName.value]"
@@ -1186,7 +1250,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "5857114375161434230"
+              "templateHash": "14471025549559958438"
             }
           },
           "parameters": {
@@ -1200,16 +1264,25 @@
             "osKind": {
               "type": "string"
             },
-            "ruleName": {
+            "storeEventsRuleName": {
               "type": "string"
             },
-            "logFilePattern": {
+            "storeEventsLogFilePattern": {
               "type": "string"
             },
-            "customTableNamePrefix": {
+            "storeEventscustomTableNamePrefix": {
               "type": "string"
             },
-            "dataCollectionEndpointId": {
+            "automationEventsRuleName": {
+              "type": "string"
+            },
+            "automationEventsLogFilePattern": {
+              "type": "string"
+            },
+            "automationEventsCustomTableNamePrefix": {
+              "type": "string"
+            },
+            "linDataCollectionEndpointId": {
               "type": "string"
             },
             "logAnalyticsPayGWorkspaceId": {
@@ -1223,15 +1296,15 @@
             {
               "type": "Microsoft.Insights/dataCollectionRules",
               "apiVersion": "2021-09-01-preview",
-              "name": "[format('{0}_{1}', parameters('ruleName'), parameters('deploymentParams').global_uniqueness)]",
+              "name": "[format('{0}_{1}', parameters('storeEventsRuleName'), parameters('deploymentParams').global_uniqueness)]",
               "location": "[parameters('deploymentParams').location]",
               "tags": "[parameters('tags')]",
               "kind": "[parameters('osKind')]",
               "properties": {
                 "description": "Log collection rule for miztiik web store data across all linux Vms.",
-                "dataCollectionEndpointId": "[parameters('dataCollectionEndpointId')]",
+                "dataCollectionEndpointId": "[parameters('linDataCollectionEndpointId')]",
                 "streamDeclarations": {
-                  "[format('Custom-{0}_CL', parameters('customTableNamePrefix'))]": {
+                  "[format('Custom-{0}_CL', parameters('storeEventscustomTableNamePrefix'))]": {
                     "columns": [
                       {
                         "name": "TimeGenerated",
@@ -1300,10 +1373,10 @@
                   "logFiles": [
                     {
                       "streams": [
-                        "[format('Custom-{0}_CL', parameters('customTableNamePrefix'))]"
+                        "[format('Custom-{0}_CL', parameters('storeEventscustomTableNamePrefix'))]"
                       ],
                       "filePatterns": [
-                        "[parameters('logFilePattern')]"
+                        "[parameters('storeEventsLogFilePattern')]"
                       ],
                       "format": "text",
                       "settings": {
@@ -1326,28 +1399,101 @@
                 "dataFlows": [
                   {
                     "streams": [
-                      "[format('Custom-{0}_CL', parameters('customTableNamePrefix'))]"
+                      "[format('Custom-{0}_CL', parameters('storeEventscustomTableNamePrefix'))]"
                     ],
                     "destinations": [
                       "[parameters('logAnalyticsPayGWorkspaceName')]"
                     ],
-                    "transformKql": "source | extend jsonContext = parse_json(tostring(RawData)) | extend TimeGenerated=now(), request_id=tostring(RawData), event_type=tostring(jsonContext.event_type), store_id=toint(jsonContext.store_id),cust_id=toint(jsonContext.cust_id),category=tostring(jsonContext.category),sku=toint(jsonContext.sku),price=toreal(jsonContext.price),qty=toint(jsonContext.qty),discount=toreal(jsonContext.discount),gift_wrap=tobool(jsonContext.gift_wrap),variant=tostring(jsonContext.variant),priority_shipping=tobool(jsonContext.priority_shipping),contact_me=tostring(jsonContext.contact_me)",
-                    "outputStream": "[format('Custom-{0}_CL', parameters('customTableNamePrefix'))]"
+                    "transformKql": "source | extend jsonContext = parse_json(tostring(RawData)) | extend TimeGenerated=now(), RawData=tostring(RawData), request_id=tostring(jsonContext.request_id) , event_type=tostring(jsonContext.event_type), store_id=toint(jsonContext.store_id),cust_id=toint(jsonContext.cust_id),category=tostring(jsonContext.category),sku=toint(jsonContext.sku),price=toreal(jsonContext.price),qty=toint(jsonContext.qty),discount=toreal(jsonContext.discount),gift_wrap=tobool(jsonContext.gift_wrap),variant=tostring(jsonContext.variant),priority_shipping=tobool(jsonContext.priority_shipping),contact_me=tostring(jsonContext.contact_me)",
+                    "outputStream": "[format('Custom-{0}_CL', parameters('storeEventscustomTableNamePrefix'))]"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Insights/dataCollectionRules",
+              "apiVersion": "2021-09-01-preview",
+              "name": "[format('{0}_{1}', parameters('automationEventsRuleName'), parameters('deploymentParams').global_uniqueness)]",
+              "location": "[parameters('deploymentParams').location]",
+              "tags": "[parameters('tags')]",
+              "kind": "[parameters('osKind')]",
+              "properties": {
+                "description": "Log collection rule for miztiik automation events across all linux Vms.",
+                "dataCollectionEndpointId": "[parameters('linDataCollectionEndpointId')]",
+                "streamDeclarations": {
+                  "[format('Custom-{0}_CL', parameters('automationEventsCustomTableNamePrefix'))]": {
+                    "columns": [
+                      {
+                        "name": "TimeGenerated",
+                        "type": "datetime"
+                      },
+                      {
+                        "name": "RawData",
+                        "type": "string"
+                      },
+                      {
+                        "name": "request_id",
+                        "type": "string"
+                      }
+                    ]
+                  }
+                },
+                "dataSources": {
+                  "logFiles": [
+                    {
+                      "streams": [
+                        "[format('Custom-{0}_CL', parameters('automationEventsCustomTableNamePrefix'))]"
+                      ],
+                      "filePatterns": [
+                        "[parameters('automationEventsLogFilePattern')]"
+                      ],
+                      "format": "text",
+                      "settings": {
+                        "text": {
+                          "recordStartTimestampFormat": "ISO 8601"
+                        }
+                      },
+                      "name": "myFancyLogFileFormat"
+                    }
+                  ]
+                },
+                "destinations": {
+                  "logAnalytics": [
+                    {
+                      "name": "[parameters('logAnalyticsPayGWorkspaceName')]",
+                      "workspaceResourceId": "[parameters('logAnalyticsPayGWorkspaceId')]"
+                    }
+                  ]
+                },
+                "dataFlows": [
+                  {
+                    "streams": [
+                      "[format('Custom-{0}_CL', parameters('automationEventsCustomTableNamePrefix'))]"
+                    ],
+                    "destinations": [
+                      "[parameters('logAnalyticsPayGWorkspaceName')]"
+                    ],
+                    "transformKql": "source | extend TimeGenerated=now(), RawData=tostring(RawData)",
+                    "outputStream": "[format('Custom-{0}_CL', parameters('automationEventsCustomTableNamePrefix'))]"
                   }
                 ]
               }
             }
           ],
           "outputs": {
-            "dataCollectionRuleId": {
+            "storeEventsDcrId": {
               "type": "string",
-              "value": "[resourceId('Microsoft.Insights/dataCollectionRules', format('{0}_{1}', parameters('ruleName'), parameters('deploymentParams').global_uniqueness))]"
+              "value": "[resourceId('Microsoft.Insights/dataCollectionRules', format('{0}_{1}', parameters('storeEventsRuleName'), parameters('deploymentParams').global_uniqueness))]"
+            },
+            "automationEventsDcrId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Insights/dataCollectionRules', format('{0}_{1}', parameters('automationEventsRuleName'), parameters('deploymentParams').global_uniqueness))]"
             }
           }
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_dce', parameters('dceParams').endpointName, parameters('deploymentParams').global_uniqueness))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dce', parameters('dceParams').endpointNamePrefix, parameters('deploymentParams').global_uniqueness))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_La', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness))]",
         "[subscriptionResourceId('Microsoft.Resources/deployments', variables('rgName'))]"
       ]

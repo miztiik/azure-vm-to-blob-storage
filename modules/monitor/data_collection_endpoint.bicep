@@ -4,8 +4,8 @@ param tags object = resourceGroup().tags
 param osKind string
 
 
-resource r_dceLinux 'Microsoft.Insights/dataCollectionEndpoints@2021-04-01' = {
-  name: '${dceParams.endpointName}-${deploymentParams.global_uniqueness}'
+resource r_lin_dce 'Microsoft.Insights/dataCollectionEndpoints@2021-04-01' = {
+  name: '${dceParams.endpointNamePrefix}-Dce-${deploymentParams.global_uniqueness}'
   location: deploymentParams.location
   tags: tags
   kind: osKind
@@ -16,5 +16,5 @@ resource r_dceLinux 'Microsoft.Insights/dataCollectionEndpoints@2021-04-01' = {
   }
 }
 
-output DataCollectionEndpointId string = r_dceLinux.id
-output DataCollectionEndpointName string = r_dceLinux.name
+output linDataCollectionEndpointId string = r_lin_dce.id
+output linDataCollectionEndpointName string = r_lin_dce.name

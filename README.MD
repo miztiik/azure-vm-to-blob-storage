@@ -102,18 +102,17 @@ To store all the order events, we will create a blob container. To write the eve
    - **Connect to the VM**
 
       The Ubuntu vm _should_ be bootstrapped using `userData` to install python3, git and also Azure Blob Storage Client Library<sup>[4]</sup>. (_For some reason the userData, bootstrap script fails, [Let me know if know how to fix it](/issues))
-      We will use a python script `az_python.py` to generate the store events data.
 
-      - Connect to the using using Just In Time Access<sup>[4]</sup>.
-      - Copy the `az_python.py` to the server.
+      - Connect to the using using Just In Time Access<sup>[5]</sup>.
+      - Copy the `az_producer.py` to the server.
       - The python script expects the storage account name (`SA_NAME`) and blob container name (`CONTAINER_NAME`) as environment variables. We need to set them before execution.(_Update to your values in the below code_)
 
         ```bash
-        ssh miztiik@publicIPOfSever
+        ssh miztiik@publicIP
         git clone https://github.com/miztiik/azure-vm-to-blob-storage
         cd azure-vm-to-blob-storage
 
-        # In case the pre-reqs have not been installed, then you will have to run the bootstrap script manually
+        # If pre-reqs have not been installed, run the bootstrap script manually
         # bash /var/azure-vm-to-blob-storage/modules/vm/bootstrap_scripts/deploy_app.sh
         export SA_NAME="warehouse4moddm014"
         export CONTAINER_NAME="store-events-014"
@@ -123,25 +122,25 @@ To store all the order events, we will create a blob container. To write the eve
         If everything goes all right, you should see messages like this,
 
         ```bash
-          INFO:azure.core.pipeline.policies.http_logging_policy:Request URL: 'https://warehouse4moddm014.blob.core.windows.net/store-events-014/sales_events/dt%3D2023_04_10/1681153081463131.json'
-          Request method: 'PUT'
-          Request headers:
-              'Content-Length': '386'
-              'x-ms-blob-type': 'REDACTED'
-              'If-None-Match': '*'
-              'x-ms-version': 'REDACTED'
-              'Content-Type': 'application/octet-stream'
-              'Accept': 'application/xml'
-              'Last-Modified': 'Mon, 10 Apr 2023 18:58:01 GMT'
-              'ETag': '"0x8DB39F5820D3CEA"'
-              'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
-              'x-ms-request-id': 'ded43899-001e-0019-62de-6bf3bd000000'
-              'x-ms-client-request-id': '9dd7975a-d7d1-11ed-82ed-0bcd26fbfe68'
-              'x-ms-version': 'REDACTED'
-              'x-ms-content-crc64': 'REDACTED'
-              'x-ms-request-server-encrypted': 'REDACTED'
-              'Date': 'Mon, 10 Apr 2023 18:58:00 GMT'
-          INFO:root:Blob sales_events/dt=2023_04_10/1681153081463131.json uploaded successfully
+        INFO:azure.core.pipeline.policies.http_logging_policy:Request URL: 'https://warehouse4moddm014.blob.core.windows.net/store-events-014/sales_events/dt%3D2023_04_10/1681153081463131.json'
+        Request method: 'PUT'
+        Request headers:
+            'Content-Length': '386'
+            'x-ms-blob-type': 'REDACTED'
+            'If-None-Match': '*'
+            'x-ms-version': 'REDACTED'
+            'Content-Type': 'application/octet-stream'
+            'Accept': 'application/xml'
+            'Last-Modified': 'Mon, 10 Apr 2023 18:58:01 GMT'
+            'ETag': '"0x8DB39F5820D3CEA"'
+            'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+            'x-ms-request-id': 'ded43899-001e-0019-62de-6bf3bd000000'
+            'x-ms-client-request-id': '9dd7975a-d7d1-11ed-82ed-0bcd26fbfe68'
+            'x-ms-version': 'REDACTED'
+            'x-ms-content-crc64': 'REDACTED'
+            'x-ms-request-server-encrypted': 'REDACTED'
+            'Date': 'Mon, 10 Apr 2023 18:58:00 GMT'
+        INFO:root:Blob sales_events/dt=2023_04_10/1681153081463131.json uploaded successfully
         ```
 
       The script should create store events and write them to Blob container. The path should be something like this `store-events-014/sales_events/dt=2023_04_10/1681153079333515.json`
@@ -222,7 +221,7 @@ Thank you for your interest in contributing to our project. Whether it is a bug 
 1. [Azure Docs: Azure ABAC][2]
 1. [Azure Docs: Azure RBAC Example Conditions][3]
 1. [Azure Docs: Azure Blob Storage client library for Python][4]
-1. [Azure Docs: Just In Time Access][4]
+1. [Azure Docs: Just In Time Access][5]
 
 
 ### 🏷️ Metadata
@@ -235,6 +234,7 @@ Thank you for your interest in contributing to our project. Whether it is a bug 
 [2]: https://learn.microsoft.com/en-us/azure/role-based-access-control/conditions-overview
 [3]: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-auth-abac-examples?toc=%2Fazure%2Frole-based-access-control%2Ftoc.json
 [4]: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-python
+[5]: https://learn.microsoft.com/en-us/azure/defender-for-cloud/just-in-time-access-usage
 
 
 [5]: https://learn.microsoft.com/en-us/azure/defender-for-cloud/just-in-time-access-usage

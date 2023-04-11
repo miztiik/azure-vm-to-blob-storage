@@ -5,8 +5,9 @@ param blobContainerName string
 param saPrimaryEndpointsBlob string
 param tags object = resourceGroup().tags
 param vnetName string
-param dataCollectionEndpointId string
-param dataCollectionRuleId string
+param linDataCollectionEndpointId string
+param storeEventsDcrId string
+param automationEventsDcrId string
 
 param vmName string = '${vmParams.vmNamePrefix}-${deploymentParams.global_uniqueness}'
 
@@ -345,24 +346,33 @@ resource AzureMonitorLinuxAgent 'Microsoft.Compute/virtualMachines/extensions@20
   }
 }
 
-// Associate Data Collection Rule to VM
-resource r_associateVmToDcr 'Microsoft.Insights/dataCollectionRuleAssociations@2021-09-01-preview' = {
-  // name: '${vmName}_${deploymentParams.global_uniqueness}'
+// Associate Data Collection Endpoint to VM
+// Apparently you cannot name this resource and also it cannot be clubbed with DCR association
+resource r_associateDce_To_Vm 'Microsoft.Insights/dataCollectionRuleAssociations@2021-09-01-preview' = {
   name: 'configurationAccessEndpoint'
   scope: r_vm
   properties: {
-    dataCollectionEndpointId: dataCollectionEndpointId
-    // dataCollectionRuleId: dataCollectionRuleId
+    dataCollectionEndpointId: linDataCollectionEndpointId
+    // dataCollectionRuleId: storeEventsDcrId
     description: 'Send Custom logs to DCR'
   }
 }
-resource r_associateVmToDcr1 'Microsoft.Insights/dataCollectionRuleAssociations@2021-09-01-preview' = {
-  name: '${vmName}_${deploymentParams.global_uniqueness}'
+resource r_associatestoreEventsDcr_To_Vm 'Microsoft.Insights/dataCollectionRuleAssociations@2021-09-01-preview' = {
+  name: '${vmName}_storeEventsDcr_${deploymentParams.global_uniqueness}'
   scope: r_vm
   properties: {
-    // dataCollectionEndpointId: dataCollectionEndpointId
-    dataCollectionRuleId: dataCollectionRuleId
-    description: 'Send Custom logs to DCR'
+    // dataCollectionEndpointId: linDataCollectionEndpointId
+    dataCollectionRuleId: storeEventsDcrId
+    description: 'Send Application Logs to DCR'
+  }
+}
+resource r_associateautomationEventsDcr_To_Vm 'Microsoft.Insights/dataCollectionRuleAssociations@2021-09-01-preview' = {
+  name: '${vmName}_automationEvents_${deploymentParams.global_uniqueness}'
+  scope: r_vm
+  properties: {
+    // dataCollectionEndpointId: linDataCollectionEndpointId
+    dataCollectionRuleId: automationEventsDcrId
+    description: 'Send Automation Logs to DCR'
   }
 }
 
@@ -386,5 +396,3 @@ output webGenHostId string = r_vm.id
 output webGenHostPrivateIP string = r_nic_01.properties.ipConfigurations[0].properties.privateIPAddress
 output vmIdentityId string = r_vmIdentity.id
 
-
-output a4 string = '((!(ActionMatches{\'Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read\'})) OR (@Resource[Microsoft.Storage/storageAccounts/blobServices/containers:name] StringEquals \'${blobContainerName}\'))'

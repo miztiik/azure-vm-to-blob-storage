@@ -15,7 +15,7 @@ GIT_REPO_URL="https://github.com/miztiik/$REPO_NAME.git"
 
 APP_DIR="/var/$REPO_NAME"
 
-LOG_FILE="/var/log/miztiik-automation-bootstrap.log"
+LOG_FILE="/var/log/miztiik-automation-bootstrap-$(date +'%Y-%m-%d').log"
 
 # https://learn.microsoft.com/en-us/azure/virtual-machines/linux/tutorial-automate-vm-deployment
 
@@ -91,9 +91,9 @@ function check_execution(){
     echo "hello" >/var/log/miztiik.log
 }
 
-check_execution                 | tee "${LOG_FILE}"
-install_libs_on_ubuntu          | tee "${LOG_FILE}"
-clone_git_repo                  | tee "${LOG_FILE}"
+check_execution                 | tee -a "${LOG_FILE}"
+install_libs_on_ubuntu          | tee -a "${LOG_FILE}"
+clone_git_repo                  | tee -a "${LOG_FILE}"
 
 
 
